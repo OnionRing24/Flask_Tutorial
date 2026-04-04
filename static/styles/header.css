@@ -3,7 +3,7 @@
 }
 
 .logo {
-  width: 45px;
+  width: 75px;
 }
 
 header li {
@@ -13,8 +13,16 @@ header li {
   padding-right: 8px;
 }
 
+header li:hover {
+  background-color: #00a6f3;
+  border: 0 solid #00a6f3;
+  border-radius: 5px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
 .topBar{
-  background-color: #faf9f7;
+  background-color: #ffffff;
   display:flex;
   justify-content: space-between;
   align-items:center;
@@ -32,6 +40,17 @@ header li {
   border-radius: 5px;
   margin-left: 10px;
 }
+.barItem input:hover{
+  border: 1px solid #999;
+}
+
+.barItem input[type="submit"]{
+  border:none;
+}
+.barItem input[type="submit"]:hover{
+  background-color: #999;
+  border: none;
+}
 
 .mainDiv {
   margin: auto;
@@ -46,6 +65,12 @@ h1{
 header a{
   text-decoration:none;
   color:black;
+}
+header button{
+  border:none;
+}
+header button:hover{
+  background-color: #999;
 }
 
 /* FOOTER */
@@ -64,7 +89,7 @@ body {
   display: grid;
   grid-template-rows: auto 1fr auto;
   font-size: 14px;
-  background-color: #f4f4f4;
+  background-color: #00a6f3;
   align-items: start;
   min-height: 100vh;
 }

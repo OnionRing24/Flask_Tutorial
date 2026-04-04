@@ -10,6 +10,21 @@
     .boat {
         min-width: 200px;
         padding: 10px;
+        margin: 10px;
+        background-color: #fff;
+        border: 0 none #fff;
+        border-radius: 15px;
+    }
+
+    .boat ul {
+        padding-left:25px
+    }
+    .boat li.boat_head {
+        font-weight: 700;
+        font-style: normal;
+    }
+    .boat li {
+        font-style: italic;
     }
 
     .pagination_bar {
@@ -50,7 +65,7 @@
             {% for boat in boats %}
                 <div class="boat">
                     <ul>
-                        <li>Boat id: {{ boat['id'] }}</li>
+                        <li class="boat_head">Boat id: {{ boat['id'] }}</li>
                         <ul>
                             <li>Name: {{ boat['name'] }}</li>
                             <li>Type: {{ boat['type'] }}</li>
