@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from sqlalchemy import Column, Integer, String, Numeric, create_engine, text
 
 app = Flask(__name__)
@@ -24,11 +24,84 @@ def user(name):
 @app.route('/boats/')
 @app.route('/boats/<page>')
 def get_boats(page=1):
-    page = int(page)  # request params always come as strings. So type conversion is necessary.
-    per_page = 10  # records to show per page
-    boats = conn.execute(text(f"SELECT * FROM boats LIMIT {per_page} OFFSET {(page - 1) * per_page}")).all()
+    page = int(page)
+    per_page = 10
+    
+    # Build WHERE clause dynamically from query parameters (if present)
+    conditions = []
+    params = {}
+    
+    if request.args.get('id'):
+        conditions.append("id = :id")
+        params['id'] = request.args['id']
+    
+    if request.args.get('name'):
+        conditions.append("name LIKE :name")
+        params['name'] = f"%{request.args['name']}%"
+    
+    if request.args.get('type'):
+        conditions.append("type LIKE :type")
+        params['type'] = f"%{request.args['type']}%"
+    
+    if request.args.get('owner_id'):
+        conditions.append("owner_id = :owner_id")
+        params['owner_id'] = request.args['owner_id']
+    
+    if request.args.get('rental_price'):
+        conditions.append("rental_price = :rental_price")
+        params['rental_price'] = request.args['rental_price']
+    
+    # Build the query
+    where_clause = " AND ".join(conditions) if conditions else "1=1"
+    
+    # Get paginated results
+    query = f"SELECT * FROM boats WHERE {where_clause} LIMIT {per_page} OFFSET {(page - 1) * per_page}"
+    boats = conn.execute(text(query), params).all()
+    
+    # Preserve search params for pagination links
+    search_params = {
+        'id': request.args.get('id', ''),
+        'name': request.args.get('name', ''),
+        'type': request.args.get('type', ''),
+        'owner_id': request.args.get('owner_id', ''),
+        'rental_price': request.args.get('rental_price', '')
+    }
+    
     print(boats)
-    return render_template('boats.html', boats=boats, page=page, per_page=per_page)
+    return render_template('boats.html', boats=boats, page=page, per_page=per_page, search_params=search_params)
+
+
+@app.route('/search', methods=['GET'])
+def search_get_request():
+    return render_template('boats_search.html')
+
+
+@app.route('/search', methods=['POST'])
+def search_boat():
+    try:
+        # Build query string from form data
+        query_string = "?"
+        params_list = []
+        
+        if request.form.get('id'):
+            params_list.append(f"id={request.form['id']}")
+        if request.form.get('name'):
+            params_list.append(f"name={request.form['name']}")
+        if request.form.get('type'):
+            params_list.append(f"type={request.form['type']}")
+        if request.form.get('owner_id'):
+            params_list.append(f"owner_id={request.form['owner_id']}")
+        if request.form.get('rental_price'):
+            params_list.append(f"rental_price={request.form['rental_price']}")
+        
+        query_string += "&".join(params_list)
+        
+        # Redirect to /boats with search parameters
+        return redirect(f"/boats/{query_string}")
+    
+    except Exception as e:
+        error = str(e)
+        return render_template('boats_search.html', error=error, success=None)
 
 
 @app.route('/create', methods=['GET'])

@@ -82,12 +82,32 @@
         </div>
 
         <div class="pagination_bar">
-            <a href= "{{ "/boats/"+ (page - 1) | string }}" class="pagination_button"> < </a>
-            <a class="pagination_button" style="background-color: black"> {{page}} </a>
-            <a href="{{ "/boats/"+ (page + 1) | string }}" class="pagination_button" > {{ page + 1 }} </a>
-            <a href="{{ "/boats/"+ (page + 2) | string }}" class="pagination_button"> {{ page + 2 }} </a>
-            <a href="{{ "/boats/"+ (page + 1) | string }}" class="pagination_button"> > </a>
+            {% set query_string = "" %}
+            {% if search_params %}
+                {% set query_parts = [] %}
+                {% if search_params.id %}
+                    {% set _ = query_parts.append("id=" + search_params.id) %}
+                {% endif %}
+                {% if search_params.name %}
+                    {% set _ = query_parts.append("name=" + search_params.name) %}
+                {% endif %}
+                {% if search_params.type %}
+                    {% set _ = query_parts.append("type=" + search_params.type) %}
+                {% endif %}
+                {% if search_params.owner_id %}
+                    {% set _ = query_parts.append("owner_id=" + search_params.owner_id) %}
+                {% endif %}
+                {% if search_params.rental_price %}
+                    {% set _ = query_parts.append("rental_price=" + search_params.rental_price) %}
+                {% endif %}
+                {% set query_string = "?" + query_parts|join("&") %}
+            {% endif %}
 
+            <a href= "{{ "/boats/"+ (page - 1) | string + query_string }}" class="pagination_button"> < </a>
+            <a class="pagination_button" style="background-color: black"> {{page}} </a>
+            <a href="{{ "/boats/"+ (page + 1) | string + query_string }}" class="pagination_button" > {{ page + 1 }} </a>
+            <a href="{{ "/boats/"+ (page + 2) | string + query_string }}" class="pagination_button"> {{ page + 2 }} </a>
+            <a href="{{ "/boats/"+ (page + 1) | string + query_string }}" class="pagination_button"> > </a>
         </div>
     </div>
 
