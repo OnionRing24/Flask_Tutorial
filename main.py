@@ -145,5 +145,43 @@ def delete_boat():
         return render_template('boats_delete.html', error=error, success=None)
 
 
+@app.route('/update/<int:boat_id>', methods=['GET'])
+def update_get_request(boat_id):
+    try:
+        # Fetch the boat data to pre-fill the form
+        boat = conn.execute(
+            text("SELECT * FROM boats WHERE id = :id"),
+            {'id': boat_id}
+        ).fetchone()
+        
+        if boat is None:
+            return render_template('boats_update.html', error="Boat not found!", boat=None)
+        
+        return render_template('boats_update.html', boat=boat)
+    except Exception as e:
+        error = str(e)
+        return render_template('boats_update.html', error=error, boat=None)
+
+
+@app.route('/update/<int:boat_id>', methods=['POST'])
+def update_boat(boat_id):
+    try:
+        conn.execute(
+            text("UPDATE boats SET name = :name, type = :type, owner_id = :owner_id, rental_price = :rental_price WHERE id = :id"),
+            {
+                'id': boat_id,
+                'name': request.form['name'],
+                'type': request.form['type'],
+                'owner_id': request.form['owner_id'],
+                'rental_price': request.form['rental_price']
+            }
+        )
+        return render_template('boats_update.html', error=None, success="Data updated successfully!", boat=request.form)
+    except Exception as e:
+        error = e.orig.args[1]
+        print(error)
+        return render_template('boats_update.html', error=error, success=None, boat=request.form)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
