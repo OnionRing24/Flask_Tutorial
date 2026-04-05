@@ -134,10 +134,14 @@ def delete_get_request():
 @app.route('/delete', methods=['POST'])
 def delete_boat():
     try:
-        conn.execute(
+        result = conn.execute(
             text("DELETE FROM boats WHERE id = :id"),
             request.form
         )
+        
+        if result.rowcount == 0:
+            return render_template('boats_delete.html', error="Boat not found!", success=None)
+        
         return render_template('boats_delete.html', error=None, success="Data deleted successfully!")
     except Exception as e:
         error = e.orig.args[1]
